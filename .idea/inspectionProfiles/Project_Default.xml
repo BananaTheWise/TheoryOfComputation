@@ -1,0 +1,87 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="A" />
+          <option value="argcomplete" />
+          <option value="astroid" />
+          <option value="asyncssh_unofficial" />
+          <option value="atheris" />
+          <option value="B" />
+          <option value="black" />
+          <option value="brotli" />
+          <option value="brotlicffi" />
+          <option value="cchardet" />
+          <option value="clr" />
+          <option value="colorama" />
+          <option value="ConfigParser" />
+          <option value="curio" />
+          <option value="Cython" />
+          <option value="dl" />
+          <option value="docrepr" />
+          <option value="fqdn" />
+          <option value="gevent" />
+          <option value="gobject" />
+          <option value="h2" />
+          <option value="HTMLParser" />
+          <option value="hypothesis" />
+          <option value="importlib_resources" />
+          <option value="ini2toml" />
+          <option value="ipykernel" />
+          <option value="ipyparallel" />
+          <option value="ipywidgets" />
+          <option value="isoduration" />
+          <option value="jnius" />
+          <option value="js" />
+          <option value="jsonpath_ng" />
+          <option value="jsonpointer" />
+          <option value="keyring" />
+          <option value="matplotlib" />
+          <option value="mock" />
+          <option value="mod" />
+          <option value="netifaces" />
+          <option value="numpydoc" />
+          <option value="openpyxl" />
+          <option value="pandas" />
+          <option value="pathlib2" />
+          <option value="Pillow" />
+          <option value="pkg1" />
+          <option value="playwright" />
+          <option value="psutil" />
+          <option value="pycares" />
+          <option value="pycurl" />
+          <option value="pyczmq" />
+          <option value="pyodide" />
+          <option value="PyOpenGL" />
+          <option value="pyparsing" />
+          <option value="pyperf" />
+          <option value="PyQt4" />
+          <option value="PyQt5" />
+          <option value="PyQt6" />
+          <option value="PySide" />
+          <option value="PySide2" />
+          <option value="pysqlite" />
+          <option value="rfc3339_validator" />
+          <option value="rfc3986_validator" />
+          <option value="rfc3987" />
+          <option value="rfc3987_syntax" />
+          <option value="sip" />
+          <option value="Sphinx" />
+          <option value="testpath" />
+          <option value="trio" />
+          <option value="trove_classifiers" />
+          <option value="uri_template" />
+          <option value="urllib3_secure_extra" />
+          <option value="webcolors" />
+          <option value="win32security" />
+          <option value="xmlrpclib" />
+          <option value="xx" />
+          <option value="yapf" />
+          <option value="zstandard" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
