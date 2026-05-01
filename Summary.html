@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Like Math But Not Math - Project Summary</title>
+    <link rel="stylesheet" href="summary.css">
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Like Math But Not Math</h1>
+        <p class="subtitle">Project Architecture and Module Summary</p>
+    </header>
+
+    <section class="overview">
+        <h2>1. Project Overview</h2>
+        <p>
+            The <strong>Like Math But Not Math</strong> is a comprehensive Python-based desktop application built using <code>PyQt5</code>. 
+            It serves as an educational and analytical tool for the Theory of Computation. The application seamlessly translates 
+            between different representations of formal (regular) languages. Users can input a Regular Expression, a Deterministic 
+            Finite Automaton (DFA), a Non-deterministic Finite Automaton (NFA), a Context-Free Grammar (CFG), or a finite set of strings. 
+            The application then normalizes this input into a minimal DFA, visually renders the automaton graph, and simultaneously 
+            derives all other representations, including an English-language description of the recognized pattern.
+        </p>
+    </section>
+
+    <section class="file-details">
+        <h2>2. Detailed File Breakdown</h2>
+        
+        <div class="module-group">
+            <h3>Root Directory (Orchestration & Setup)</h3>
+            
+            <div class="file-card">
+                <h4><code>main.py</code></h4>
+                <p><strong>Role:</strong> Application Entry Point.</p>
+                <p><strong>Description:</strong> Bootstraps the PyQt5 application. It initializes the global application settings, applies a custom dark theme styling using QPalette and stylesheets, displays a custom splash screen with the project's branding, and finally instantiates and launches the <code>MainWindow</code>.</p>
+                <div class="deep-dive">
+                    <strong>Technical Details:</strong> The script sets the execution path to correctly resolve internal modules. It uses <code>QPainter</code> to programmatically generate a splash screen image in-memory. The <code>set_dark_theme()</code> method overrides the OS default styling by applying a custom <code>QPalette</code> alongside a robust embedded CSS string, mapping variables to PyQt widgets like buttons, scrollbars, and tabs for a uniform "Fusion" dark aesthetic. Finally, it delegates execution to the main Qt event loop.
+                </div>
+            </div>
+            
+            <div class="file-card">
+                <h4><code>controller.py</code></h4>
+                <p><strong>Role:</strong> The Backend API / Logic Bridge.</p>
+                <p><strong>Description:</strong> Acts as the intermediary between the GUI and the underlying computational algorithms. It defines custom parsing functions (like <code>parse_dfa_from_text</code> and <code>parse_cfg_from_text</code>) to interpret the raw user input from the UI. The core <code>convert()</code> function takes the parsed input, delegates it to the appropriate algorithms to generate a minimal DFA, and then back-computes all equivalent language representations (Regex, CFG, generated strings, English description) returning a unified dictionary to the UI.</p>
+                <div class="deep-dive">
+                    <strong>Technical Details:</strong> Acts as a Facade pattern over the complex <code>Core</code> modules. It handles the parsing phase by splitting strings and applying semantic rules (e.g., verifying transition structures <code>state,symbol -> next</code>). The <code>convert()</code> function centralizes exception handling, catching <code>ValueErrors</code> or <code>RecursionErrors</code> and piping them back as a safe 'error' string instead of crashing the UI. It also includes utility functions like <code>strings_to_dfa()</code> which builds a Trie out of a finite set of strings and translates the Trie nodes into DFA states.
+                </div>
+            </div>
+            
+            <div class="file-card">
+                <h4><code>requirements.txt</code> & <code>README.md</code></h4>
+                <p><strong>Role:</strong> Documentation and Dependencies.</p>
+                <p><strong>Description:</strong> <code>requirements.txt</code> lists the external dependencies (PyQt5, pytest, graphviz). <code>README.md</code> provides user instructions on installation, execution, and syntax rules for inputting various formats.</p>
+                <div class="deep-dive">
+                    <strong>Technical Details:</strong> These standard configuration files define the runtime environment. The README strictly defines the DSL (Domain Specific Language) expected by the UI text boxes, ensuring users understand how to represent mathematical concepts (like using ε, epsilon, or eps for the empty string).
+                </div>
+            </div>
+            
+            <div class="file-card">
+                <h4><code>conftest.py</code></h4>
+                <p><strong>Role:</strong> Test Configuration.</p>
+                <p><strong>Description:</strong> Sets up the Python system path prior to test execution, ensuring that <code>pytest</code> can successfully locate and import modules from the project's root directory.</p>
+                <div class="deep-dive">
+                    <strong>Technical Details:</strong> This ensures that standard testing frameworks do not fail due to relative import ambiguities, seamlessly modifying <code>sys.path</code> at the root level before any test suite loads.
+                </div>
+            </div>
+        </div>
+
+        <div class="module-group">
+            <h3>Core Module (<code>/Core</code>) - Theoretical Algorithms</h3>
+            
+            <div class="file-card">
+                <h4><code>automata.py</code></h4>
+                <p><strong>Role:</strong> Fundamental Data Structures.</p>
+                <p><strong>Description:</strong> Contains the <code>DFA</code> and <code>NFA</code> Python dataclasses. This file provides intrinsic automaton functionality such as simulating a string against the machine (<code>accepts()</code>), epsilon-closures for NFAs, subset construction internally for NFA to DFA conversion, DFA state reachability parsing, and methods to export the automatons to Graphviz DOT formats for rendering.</p>
+                <div class="deep-dive">
+                    <strong>Technical Details:</strong> Built heavily on Python sets and dictionaries for O(1) average lookup times. The transition tables are represented as <code>Dict[Tuple[str, str], str]</code> (or <code>Set[str]</code> for NFAs). It includes an integrated Hopcroft minimization algorithm in the DFA class, partitioning states into accepting and non-accepting, and iteratively splitting them based on transition equivalence. Epsilon-closures use stack-based DFS traversal. Both classes provide native serialization via <code>to_dict()</code>/<code>from_dict()</code> for JSON portability and <code>to_graphviz()</code> for visual exports.
+                </div>
+            </div>
+            
+            <div class="file-card">
+                <h4><code>regex_parser.py</code></h4>
+                <p><strong>Role:</strong> Lexer and Abstract Syntax Tree (AST) Generator.</p>
+                <p><strong>Description:</strong> Implements a custom recursive descent parser that breaks down a regular expression string into an Abstract Syntax Tree. It handles operator precedence (Star/Plus/Question Mark > Concatenation > Union) and identifies syntax errors.</p>
+                <div class="deep-dive">
+                    <strong>Technical Details:</strong> Implements a classic formal grammar parsing algorithm without relying on Python's native <code>re</code> library. It consumes characters linearly, constructing polymorphic AST nodes (<code>LiteralNode</code>, <code>StarNode</code>, <code>UnionNode</code>, etc.). The recursive structure inherently enforces the order of operations, where grouping via parentheses recursively calls the <code>parse_union()</code> root. It explicitly guards against malformed syntax like dangling operators, unmatched parentheses, or consecutive quantifiers.
+                </div>
+            </div>
+            
+            <div class="file-card">
+                <h4><code>thompson.py</code></h4>
+                <p><strong>Role:</strong> Thompson's Construction Algorithm.</p>
+                <p><strong>Description:</strong> Takes the AST produced by <code>regex_parser.py</code> and traverses it to construct an equivalent NFA. It contains the logic for joining sub-NFAs together using epsilon transitions according to Thompson's theoretical rules.</p>
+                <div class="deep-dive">
+                    <strong>Technical Details:</strong> Recursively maps each AST node to a small <code>NFAFragment</code>. It uses inductive proofs from automata theory: combining fragments by wiring the accept state of one fragment to the start state of another using ε-transitions. A <code>StateCounter</code> maintains globally unique identifiers (q0, q1, etc.) throughout the recursive calls. The algorithm natively maps extended operators like <code>+</code> (one or more) and <code>?</code> (zero or one) into standard NFA logic.
+                </div>
+            </div>
+            
+            <div class="file-card">
+                <h4><code>subset.py</code></h4>
+                <p><strong>Role:</strong> Subset Construction & Minimization.</p>
+                <p><strong>Description:</strong> Houses two critical algorithms. First, it implements formal Subset Construction (Powerset construction) to determinize an NFA into a DFA. Second, it implements Hopcroft's partition refinement algorithm (<code>dfa_minimize</code>) to reduce the DFA to its most optimal, minimal number of states.</p>
+                <div class="deep-dive">
+                    <strong>Technical Details:</strong> Powerset Construction computes the ε-closure of a starting set of states and creates a new aggregate state. By treating frozensets of NFA states as singular DFA states, it iteratively evaluates all possible inputs to discover newly reachable sets until closure. The Hopcroft minimization algorithm is implemented optimally by maintaining a working set of partitions <code>W</code> and evaluating discriminators to split equivalent states down to their foundational mathematical equivalence classes, stripping away any redundancy.
+                </div>
+            </div>
+            
+            <div class="file-card">
+                <h4><code>state_elim.py</code></h4>
+                <p><strong>Role:</strong> State Elimination Algorithm.</p>
+                <p><strong>Description:</strong> Implements the reverse conversion from a DFA back into a Regular Expression. It constructs a Generalized NFA (GNFA), systematically rips out states, and builds up a complex regular expression along the remaining transition edges.</p>
+                <div class="deep-dive">
+                    <strong>Technical Details:</strong> Transforms the standard DFA into a GNFA by defining a singular new start state and a singular new accept state connected via ε-transitions. It selectively eliminates states one-by-one. When state <code>q_mid</code> is ripped, the transition connecting <code>q_in</code> to <code>q_out</code> is rewritten as a regex: <code>R_in_mid (R_mid_mid)* R_mid_out</code>, unioned with the existing direct transition. The file includes heavy string manipulation utilities to inject parentheses dynamically only when necessary to preserve precedence during concatenations.
+                </div>
+            </div>
+            
+            <div class="file-card">
+                <h4><code>grammer.py</code></h4>
+                <p><strong>Role:</strong> Context-Free Grammar Conversions.</p>
+                <p><strong>Description:</strong> Contains functions to translate a regular language back and forth between a DFA and a Context-Free Grammar. It establishes variable/terminal mappings and production rules (<code>dfa_to_cfg</code>) and reverses the process by turning production rules into NFA states (<code>cfg_to_nfa</code>).</p>
+                <div class="deep-dive">
+                    <strong>Technical Details:</strong> Translates state machines into Right-Linear Grammars (a subset of CFG strictly equivalent to regular languages). For DFA to CFG, every state becomes a Non-Terminal Variable (e.g., <code>V_q0</code>), and transitions become production rules (<code>V_q0 → a V_q1</code>). Accepting states receive an ε production. Conversely, CFG to NFA parses production strings, assigning the left-hand variable as the origin state and mapping the right-hand side to a transition and destination state, constructing a dummy final state for terminal-only rules.
+                </div>
+            </div>
+            
+            <div class="file-card">
+                <h4><code>enumerator.py</code></h4>
+                <p><strong>Role:</strong> String Generation & Counting.</p>
+                <p><strong>Description:</strong> Analyzes a DFA to lazily generate the actual strings that belong to the language. It uses a Breadth-First Search (BFS) to prevent infinite loops, handles dead/trap states gracefully, and limits output based on string length. It also includes dynamic programming logic for exact combinations counting.</p>
+                <div class="deep-dive">
+                    <strong>Technical Details:</strong> Employs a generator pattern (<code>yield</code>) to support lazy evaluation, crucial for infinite languages. It optimizes the BFS by pre-computing reachability; if an accept state cannot be reached from the current branch, the branch is aggressively pruned to prevent memory explosions traversing deep into 'trap' structures. Additionally, the <code>count_strings()</code> uses dynamic programming, building a 2D matrix of lengths and states to calculate exact combinations mathematically without actually simulating them.
+                </div>
+            </div>
+        </div>
+
+        <div class="module-group">
+            <h3>GUI Module (<code>/GUI</code>) - User Interface</h3>
+            
+            <div class="file-card">
+                <h4><code>main_window.py</code></h4>
+                <p><strong>Role:</strong> Primary User Interface.</p>
+                <p><strong>Description:</strong> Assembles the PyQT5 widgets, managing the Left Panel (dynamic inputs for Regex, structured tables for FA/CFG), the Center Panel (Canvas rendering), and the Right Panel (tabbed outputs for Regex, CFG, Strings, English). It utilizes a <code>QThread</code> worker to keep the UI responsive while expensive DFA algorithms run in the background.</p>
+                <div class="deep-dive">
+                    <strong>Technical Details:</strong> Manages state using PyQT signals and slots. Input modes are toggled via a <code>QStackedWidget</code>-like behavior, swapping out plaintext inputs for <code>QTableWidgets</code>. Because converting large automata or enumerating strings can block the main thread, the actual <code>convert()</code> execution is wrapped in a <code>ConvertWorker</code> class extending <code>QThread</code>. The results are emitted back via a custom <code>pyqtSignal</code> to safely update the GUI asynchronously.
+                </div>
+            </div>
+            
+            <div class="file-card">
+                <h4><code>dfa_canvas.py</code></h4>
+                <p><strong>Role:</strong> Graph Visualizer.</p>
+                <p><strong>Description:</strong> A custom widget that takes a DFA object and uses the <code>graphviz</code> library to render it into an image. It handles zooming, panning, and provides the groundwork for step-by-step visual simulation of string testing (highlighting the current active state in yellow/gold).</p>
+                <div class="deep-dive">
+                    <strong>Technical Details:</strong> Leverages the Graphviz dot engine to compute optimal node layouts dynamically. The dot file is written to a temporary directory and compiled to both PNG (for display via <code>QPixmap</code>) and plain text (to parse node coordinates). Interactive zooming is handled by applying scale transformations to the base Pixmap. During interactive string simulation, the DFA graph is repeatedly re-rendered with modified node styling properties (altering fillcolors to highlight active states).
+                </div>
+            </div>
+        </div>
+
+        <div class="module-group">
+            <h3>Nlg Module (<code>/Nlg</code>) - Natural Language Generation</h3>
+            
+            <div class="file-card">
+                <h4><code>describer.py</code></h4>
+                <p><strong>Role:</strong> Human-Readable Language Analysis.</p>
+                <p><strong>Description:</strong> Programmatically inspects the structure and accepted strings of a DFA to deduce its purpose in plain English. Uses mathematical heuristics to detect if the language accepts everything, nothing, has a fixed length, demands a specific prefix/suffix, or counts specific symbols (Modulo arithmetic). This bridges the gap between raw math and human comprehension.</p>
+                <div class="deep-dive">
+                    <strong>Technical Details:</strong> Implements pattern recognition on the DFA structure. Emptiness is checked by verifying reachability from the start state to any accept state. Finiteness is verified via cycle detection (DFS with recursion stack tracking). Fixed-length checks evaluate standard string enumerations. Modulo behavior is detected by iterating states and checking if symbols form a perfect, continuous cycle covering all states with a single accepting modulo remainder. It strings together these mathematical deductions to dynamically template English sentences.
+                </div>
+            </div>
+        </div>
+        
+        <div class="module-group">
+            <h3>Tests Module (<code>/tests</code>) - Quality Assurance</h3>
+            <p class="group-desc">A comprehensive suite of Pytest files designed to test the application's mathematical algorithms to ensure complete theoretical accuracy:</p>
+            <ul>
+                <li><strong><code>test_automata.py</code></strong>: Tests DFA/NFA object behaviors, state transitions, epsilon closures, and JSON serialization.</li>
+                <li><strong><code>test_regex_parser.py</code></strong>: Verifies AST generation, correct operator precedence, and syntax error catching.</li>
+                <li><strong><code>test_thompson.py</code></strong>: Asserts that Regex successfully compiles to correct and operational NFAs.</li>
+                <li><strong><code>test_subset.py</code></strong>: Validates NFA to DFA determinization and state minimization algorithms.</li>
+                <li><strong><code>test_state_elim.py</code></strong>: Verifies DFA to Regex backward compilation via round-trip language testing.</li>
+                <li><strong><code>test_grammer.py</code></strong>: Confirms production rules are accurately mapped from DFA to CFG and vice versa.</li>
+                <li><strong><code>test_enumerator.py</code></strong>: Checks accurate lexicographical string output bounds and counting logic.</li>
+                <li><strong><code>test_describer.py</code></strong>: Verifies the Nlg module accurately deduces plain-English heuristics from DFAs.</li>
+                <li><strong><code>test_integration.py</code></strong>: Tests the <code>controller.py</code> conversions from end-to-end to simulate full user flows.</li>
+            </ul>
+        </div>
+
+    </section>
+</div>
+
+</body>
+</html>

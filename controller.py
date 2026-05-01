@@ -71,6 +71,56 @@ def parse_dfa_from_text(text: str) -> DFA:
     return DFA(states, alphabet, transitions, start, accept)
 
 
+def parse_nfa_from_text(text: str) -> NFA:
+    states = set()
+    alphabet = set()
+    start = None
+    accept = set()
+    transitions = {}
+    
+    mode = None
+    for line in text.splitlines():
+        line = line.strip()
+        if not line: continue
+        
+        if line.startswith('states:'):
+            states = {s.strip() for s in line.split(':', 1)[1].split(',')}
+        elif line.startswith('alphabet:'):
+            alphabet = {a.strip() for a in line.split(':', 1)[1].split(',')}
+        elif line.startswith('start:'):
+            start = line.split(':', 1)[1].strip()
+        elif line.startswith('accept:'):
+            acc_str = line.split(':', 1)[1].strip()
+            if acc_str:
+                accept = {s.strip() for s in acc_str.split(',')}
+        elif line.startswith('transitions:'):
+            mode = 'transitions'
+        elif mode == 'transitions':
+            if '->' not in line:
+                raise ValueError(f"Invalid transition format: {line}")
+            lhs, rhs = line.split('->')
+            src_char = lhs.strip()
+            nxt_states = {s.strip() for s in rhs.split(',')} if rhs.strip() else set()
+            if ',' not in src_char:
+                raise ValueError(f"Transition lhs must be 'state,char': {src_char}")
+            src, char = src_char.split(',', 1)
+            src = src.strip()
+            char = char.strip()
+            if char in ('ε', 'epsilon', 'eps'):
+                char = ''
+            if (src, char) not in transitions:
+                transitions[(src, char)] = set()
+            transitions[(src, char)].update(nxt_states)
+        else:
+            raise ValueError(f"Unexpected line: {line}")
+            
+    if not states: raise ValueError("No states defined")
+    if not alphabet: raise ValueError("No alphabet defined")
+    if not start: raise ValueError("No start state defined")
+    
+    return NFA(states, alphabet, transitions, start, accept)
+
+
 def parse_cfg_from_text(text: str) -> dict:
     variables = set()
     terminals = set()
@@ -168,10 +218,7 @@ def convert(input_type: str, input_text: str) -> dict:
             dfa = dfa_minimize(dfa)
 
         elif input_type == 'nfa':
-            try:
-                nfa = NFA.from_dict(json.loads(input_text))
-            except Exception:
-                raise ValueError("Could not parse NFA JSON. Check your JSON format.")
+            nfa = parse_nfa_from_text(input_text)
             dfa = subset_construction(nfa)
             dfa = dfa_minimize(dfa)
 

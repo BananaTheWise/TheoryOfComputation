@@ -18,7 +18,7 @@ def create_splash_pixmap() -> QPixmap:
     font = QFont("Arial", 28, QFont.Bold)
     painter.setFont(font)
     painter.setPen(QColor("#ffffff"))
-    painter.drawText(pixmap.rect(), Qt.AlignCenter, "Formal Language Converter")
+    painter.drawText(pixmap.rect(), Qt.AlignCenter, "Like Math But Not Math")
     font.setPointSize(14);
     font.setBold(False)
     painter.setFont(font)
@@ -68,7 +68,7 @@ def set_dark_theme(app: QApplication):
 
 def main():
     app = QApplication(sys.argv)
-    app.setApplicationName("Formal Language Converter")
+    app.setApplicationName("Like Math But Not Math")
     app.setApplicationVersion("1.0.0")
     app.setOrganizationName("Future University Egypt")
     set_dark_theme(app)
@@ -76,7 +76,7 @@ def main():
     splash = QSplashScreen(create_splash_pixmap(), Qt.WindowStaysOnTopHint)
     splash.show()
     app.processEvents()
-    time.sleep(1.5)  # Splash screen duration
+    time.sleep(3)  # Splash screen duration
 
     window = MainWindow()
     window.showMaximized()
