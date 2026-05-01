@@ -1,0 +1,245 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #111118;
+}
+
+/* Slides container (snap scrolling) */
+.slides {
+    height: 100vh;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    /* Hide scrollbar */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.slides::-webkit-scrollbar {
+    display: none;
+}
+
+/* Individual Slide */
+.slide {
+    height: 100vh;
+    width: 100%;
+    scroll-snap-align: start;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 2rem;
+}
+
+.slide-dark {
+    background-color: #1a1a24;
+    color: #e8e8f0;
+}
+
+.slide-light {
+    background-color: #f4f4f9;
+    color: #2a2a38;
+}
+
+/* Content wrappers */
+.content-wrapper {
+    max-width: 900px;
+    width: 100%;
+    text-align: left;
+}
+
+.title-content {
+    text-align: center;
+}
+
+/* Typography */
+h1 {
+    font-size: 4rem;
+    margin-bottom: 0.5rem;
+    color: #7c6af7;
+}
+
+h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    display: inline-block;
+}
+
+h2::after {
+    content: '';
+    position: absolute;
+    width: 60%;
+    height: 4px;
+    background-color: #7c6af7;
+    bottom: -10px;
+    left: 0;
+    border-radius: 2px;
+}
+
+.slide-dark h2::after {
+    left: 0;
+}
+
+.title-content h2::after {
+    left: 20%;
+}
+
+p {
+    font-size: 1.4rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.subtitle {
+    font-size: 1.5rem;
+    color: #aaaaaa;
+    margin-bottom: 3rem;
+}
+
+.supervision {
+    font-size: 1.2rem;
+    margin-top: 3rem;
+    padding: 1.5rem;
+    border: 2px dashed #7c6af7;
+    border-radius: 8px;
+    display: inline-block;
+    color: #e8e8f0;
+}
+
+/* Layout elements */
+.feature-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.feature-card {
+    background: rgba(124, 106, 247, 0.1);
+    border-left: 4px solid #7c6af7;
+    padding: 1.5rem;
+    border-radius: 4px;
+    flex: 1 1 calc(50% - 1.5rem);
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #7c6af7;
+}
+
+.feature-card p {
+    font-size: 1.1rem;
+    margin-bottom: 0;
+}
+
+.wide-card {
+    flex: 1 1 100%;
+}
+
+.example-text {
+    font-size: 1rem;
+    color: #aaaaaa;
+    margin-top: 0.5rem;
+}
+
+/* Image Placeholder */
+.image-placeholder {
+    width: 100%;
+    height: 400px;
+    background-color: #e0e0e0;
+    border: 3px dashed #7c6af7;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
+    color: #555566;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.slide-dark .image-placeholder {
+    background-color: #111118;
+    color: #aaaaaa;
+}
+
+/* Thank You */
+.thank-you {
+    font-size: 5rem;
+    background: linear-gradient(90deg, #7c6af7, #a497f9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Navigation Dots */
+.nav-dots {
+    position: fixed;
+    right: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    z-index: 100;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: rgba(124, 106, 247, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dot.active {
+    background-color: #7c6af7;
+    transform: scale(1.3);
+}
+
+.dot:hover {
+    background-color: #a497f9;
+}
+
+/* Animations */
+@keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-down {
+    animation: fadeDown 1s ease-out forwards;
+}
+
+.animate-fade-up {
+    animation: fadeUp 1s ease-out forwards;
+    animation-delay: 0.3s;
+    opacity: 0;
+}
+
+.animate-fade-up-delayed {
+    animation: fadeUp 1s ease-out forwards;
+    animation-delay: 0.6s;
+    opacity: 0;
+}

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Like Math But Not Math - Presentation</title>
+    <link rel="stylesheet" href="presentation.css">
+    <style>
+        .presentation-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            border: 2px solid #7c6af7;
+        }
+
+        .image-container {
+            width: 100%;
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 2rem;
+        }
+
+        .tall-image-container {
+            height: 450px;
+        }
+
+        .short-image-container {
+            height: 200px;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="nav-dots">
+        <div class="dot active" onclick="scrollToSlide(0)"></div>
+        <div class="dot" onclick="scrollToSlide(1)"></div>
+        <div class="dot" onclick="scrollToSlide(2)"></div>
+        <div class="dot" onclick="scrollToSlide(3)"></div>
+        <div class="dot" onclick="scrollToSlide(4)"></div>
+        <div class="dot" onclick="scrollToSlide(5)"></div>
+        <div class="dot" onclick="scrollToSlide(6)"></div>
+        <div class="dot" onclick="scrollToSlide(7)"></div>
+    </div>
+
+    <div class="slides" id="slides-container">
+        <!-- Slide 1: Title -->
+        <section class="slide slide-dark">
+            <div class="content-wrapper title-content">
+                <h1 class="animate-fade-down">Theory of Computation</h1>
+                <h2 class="animate-fade-up">Like Math But Not Math</h2>
+                <p class="subtitle animate-fade-up">An interactive tool for exploring automata, regular expressions, and context-free grammars.</p>
+
+                <div class="supervision animate-fade-up-delayed">
+                    <strong>Under the supervision of:</strong><br>
+                    Professor Osama Fathy<br>
+                    TA Ola Mahmoud
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 2: Introduction -->
+        <section class="slide slide-light">
+            <div class="content-wrapper">
+                <h2>Project Overview</h2>
+                <p>Our application bridges the gap between theoretical computer science and practical implementation. It allows users to seamlessly convert between different formal language representations.</p>
+
+                <div class="image-container">
+                    <img src="imgs/image1.jpeg" alt="Main App UI" class="presentation-image animate-fade-up-delayed">
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: Supported Formats -->
+        <section class="slide slide-dark">
+            <div class="content-wrapper">
+                <h2>Supported Inputs</h2>
+                <div class="feature-list">
+                    <div class="feature-card">
+                        <h3>Regular Expressions</h3>
+                        <p>Parse and evaluate standard Regex into Thompson's NFA and subsets.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>DFA & NFA</h3>
+                        <p>Interactive table and text inputs for defining states and transitions.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>CFG (Regular)</h3>
+                        <p>Support for context-free grammar production rules conversion.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>String Generator</h3>
+                        <p>Build automata directly from a set of accepted strings.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: Core Features -->
+        <section class="slide slide-light">
+            <div class="content-wrapper">
+                <h2>Core Algorithms</h2>
+                <p>We implemented standard algorithms to provide optimized and accurate theoretical results.</p>
+                <div class="feature-list">
+                    <div class="feature-card wide-card">
+                        <h3>Thompson's Construction</h3>
+                        <p>Converts regular expressions into Non-deterministic Finite Automata (NFA) systematically.</p>
+                    </div>
+                    <div class="feature-card wide-card">
+                        <h3>Subset Construction</h3>
+                        <p>Eliminates non-determinism by converting NFA to Deterministic Finite Automata (DFA).</p>
+                    </div>
+                    <div class="feature-card wide-card">
+                        <h3>Hopcroft's DFA Minimization</h3>
+                        <p>Reduces the DFA to its minimal state representation for optimized evaluation.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: Advanced Features -->
+        <section class="slide slide-dark">
+            <div class="content-wrapper">
+                <h2>Advanced Capabilities</h2>
+                <p>Moving beyond standard automata, we integrated complex computational concepts.</p>
+
+                <div class="feature-list">
+                    <div class="feature-card wide-card">
+                        <h3>Context-Free Grammars</h3>
+                        <p>Parses CFG production rules and translates regular grammars directly into finite automata.</p>
+                    </div>
+                    <div class="feature-card wide-card">
+                        <h3>State Elimination (DFA to Regex)</h3>
+                        <p>Uses generalized finite automata (GNFA) to rip out states and formulate an equivalent regular expression.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6: Visualizations -->
+        <section class="slide slide-light">
+            <div class="content-wrapper">
+                <h2>Dynamic Visualizations</h2>
+                <p>Theoretical concepts are hard to grasp without visuals. We utilize Graphviz to generate dynamic, interactive diagrams of the generated state machines.</p>
+
+                <div class="image-container tall-image-container">
+                    <img src="imgs/image2.jpeg" alt="Graphviz Automata Output" class="presentation-image animate-fade-up-delayed">
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: Natural Language & Enumeration -->
+        <section class="slide slide-dark">
+            <div class="content-wrapper">
+                <h2>Analysis & Insights</h2>
+                <p>Beyond conversions, the system analyzes the finite automata to generate meaningful insights.</p>
+                <div class="feature-list">
+                    <div class="feature-card wide-card">
+                        <h3>String Enumeration</h3>
+                        <p>Generates the shortest accepted strings (lexicographically) for verification and testing.</p>
+                    </div>
+                    <div class="feature-card wide-card">
+                        <h3>Natural Language Generation</h3>
+                        <p>The system translates complex DFA structures into understandable English descriptions.</p>
+                        <p class="example-text"><i>Example: "This automaton accepts strings that contain 'ab' and end with 'a'."</i></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8: Thank You -->
+        <section class="slide slide-light">
+            <div class="content-wrapper title-content">
+                <h1 class="thank-you">Thank You</h1>
+                <p>Ready for a live demonstration.</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const container = document.getElementById('slides-container');
+        const dots = document.querySelectorAll('.dot');
+        const slides = document.querySelectorAll('.slide');
+        let currentIndex = 0;
+        const totalSlides = slides.length;
+
+        // Simple smooth scrolling to slides
+        function scrollToSlide(index) {
+            if (index < 0) index = 0;
+            if (index >= totalSlides) index = totalSlides - 1;
+            currentIndex = index;
+            slides[index].scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Keyboard navigation using arrow keys
+        window.addEventListener('keydown', (e) => {
+            // Right or Down arrow keys go to the next slide
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                e.preventDefault(); // Prevent default scrolling
+                scrollToSlide(currentIndex + 1);
+            }
+            // Left or Up arrow keys go to the previous slide
+            else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                e.preventDefault(); // Prevent default scrolling
+                scrollToSlide(currentIndex - 1);
+            }
+        });
+
+        // Update active dot and sync current index on scroll (for trackpad/mousewheel)
+        container.addEventListener('scroll', () => {
+            let index = Math.round(container.scrollTop / window.innerHeight);
+            currentIndex = index;
+
+            dots.forEach((dot, i) => {
+                if (i === index) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+
+            // Re-trigger animations for the current slide
+            const currentSlide = slides[index];
+            const animatedElements = currentSlide.querySelectorAll('[class*="animate-"]');
+            animatedElements.forEach(el => {
+                el.style.animation = 'none';
+                el.offsetHeight; /* trigger reflow */
+                el.style.animation = null;
+            });
+        });
+    </script>
+</body>
+</html>
