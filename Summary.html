@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Like Math But Not Math - Project Summary</title>
     <link rel="stylesheet" href="summary.css">
+    <style>
+        /* Embedded CSS for quick rendering without breaking existing summary.css */
+        .pipeline-flow { margin-top: 2rem; background: rgba(124, 106, 247, 0.05); border: 1px solid #7c6af7; border-radius: 8px; padding: 2rem; }
+        .pipeline-step { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #2a2a38; }
+        .pipeline-step:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .step-title { color: #7c6af7; font-size: 1.3rem; margin-bottom: 0.5rem; display: flex; align-items: center; }
+        .step-num { background: #7c6af7; color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; justify-content: center; align-items: center; margin-right: 10px; font-size: 1rem; }
+        .file-tag { background: #111118; border: 1px solid #2a2a38; padding: 2px 8px; border-radius: 4px; font-family: monospace; color: #a497f9; font-size: 0.9rem; margin-right: 8px; }
+        .func-tag { color: #e8e8f0; font-family: monospace; font-size: 0.95rem; font-weight: bold; background: #2a2a38; padding: 2px 6px; border-radius: 4px; }
+        .pipeline-step ul { margin-top: 0.5rem; padding-left: 1.5rem; }
+        .pipeline-step li { margin-bottom: 0.5rem; line-height: 1.5; }
+    </style>
 </head>
 <body>
 
@@ -26,8 +38,66 @@
         </p>
     </section>
 
+    <section class="pipeline-flow">
+        <h2>2. Data Pipeline: How Inputs Become Outputs</h2>
+        <p>This details the exact step-by-step lifecycle of user data depending on the chosen input type, explicitly mapping every function to the file it resides in.</p>
+
+        <div class="pipeline-step">
+            <div class="step-title"><span class="step-num">1</span> Input Gathering (UI Layer)</div>
+            <p><strong>How it works:</strong> The user enters data into the application via the UI inputs.</p>
+            <ul>
+                <li>If the user selected "DFA" or "NFA", the <span class="func-tag">get_fa_text()</span> function (located in <span class="file-tag">GUI/main_window.py</span>) is called to extract rows from the UI tables and format them into a string.</li>
+                <li>If "CFG" is selected, the <span class="func-tag">get_cfg_text()</span> function (located in <span class="file-tag">GUI/main_window.py</span>) does the same for the production rules table.</li>
+                <li>When the user clicks "Convert", the UI delegates the heavy lifting to a background thread using the <span class="func-tag">ConvertWorker.run()</span> method (located in <span class="file-tag">GUI/main_window.py</span>) so the UI doesn't freeze.</li>
+            </ul>
+        </div>
+
+        <div class="pipeline-step">
+            <div class="step-title"><span class="step-num">2</span> Parsing & Initial Conversion (Backend Routing)</div>
+            <p><strong>How it works:</strong> The background worker calls the main <span class="func-tag">convert(input_type, input_text)</span> function (located in <span class="file-tag">controller.py</span>). This function acts as the traffic controller to establish a base DFA.</p>
+            <ul>
+                <li><strong>If Regex:</strong> Uses <span class="func-tag">parse()</span> (in <span class="file-tag">Core/regex_parser.py</span>) to build an Abstract Syntax Tree (AST). Then passes the AST to <span class="func-tag">regex_to_nfa()</span> (in <span class="file-tag">Core/thompson.py</span>) which builds an NFA via Thompson's Construction. This NFA is sent to step 3.</li>
+                <li><strong>If DFA:</strong> Uses <span class="func-tag">parse_dfa_from_text()</span> (in <span class="file-tag">controller.py</span>) to read the formatted text and construct a native <code>DFA</code> object (defined in <span class="file-tag">Core/automata.py</span>).</li>
+                <li><strong>If NFA:</strong> Uses <span class="func-tag">parse_nfa_from_text()</span> (in <span class="file-tag">controller.py</span>) to construct a native <code>NFA</code> object (defined in <span class="file-tag">Core/automata.py</span>). This NFA is sent to step 3.</li>
+                <li><strong>If CFG:</strong> Uses <span class="func-tag">parse_cfg_from_text()</span> (in <span class="file-tag">controller.py</span>) to parse the text into a dictionary. Then <span class="func-tag">cfg_to_nfa()</span> (in <span class="file-tag">Core/grammar.py</span>) iterates over the dictionary to turn grammar rules into states and transitions, returning an NFA which is sent to step 3.</li>
+                <li><strong>If Strings:</strong> Uses <span class="func-tag">strings_to_dfa()</span> (in <span class="file-tag">controller.py</span>) to build a Trie-like <code>DFA</code> structure, branching out for each character and adding dead states for unaccepted paths.</li>
+            </ul>
+        </div>
+
+        <div class="pipeline-step">
+            <div class="step-title"><span class="step-num">3</span> Normalization (Determinization & Minimization)</div>
+            <p><strong>How it works:</strong> Before we generate the outputs, we must ensure the Automaton is in its smallest, most efficient form.</p>
+            <ul>
+                <li>If the input yielded an NFA (from Regex, NFA, or CFG inputs), the controller calls <span class="func-tag">subset_construction(nfa)</span> (in <span class="file-tag">Core/subset.py</span>). This function calculates epsilon-closures to remove non-determinism, returning a full DFA.</li>
+                <li>Regardless of the path taken, the DFA is then passed into <span class="func-tag">dfa_minimize(dfa)</span> (in <span class="file-tag">Core/subset.py</span>). This applies Hopcroft's partition refinement to remove unreachable states and merge equivalent states, guaranteeing a minimal DFA.</li>
+            </ul>
+        </div>
+
+        <div class="pipeline-step">
+            <div class="step-title"><span class="step-num">4</span> Generating the Outputs</div>
+            <p><strong>How it works:</strong> With the optimal minimal DFA secured, the <span class="func-tag">convert()</span> function (in <span class="file-tag">controller.py</span>) fires off four separate algorithms simultaneously to reverse-engineer the DFA into the other formats:</p>
+            <ul>
+                <li><strong>Regex:</strong> Calls <span class="func-tag">dfa_to_regex(dfa)</span> (in <span class="file-tag">Core/state_elim.py</span>). This function constructs a GNFA and rips states out one by one, merging transition edges into complex regular expressions.</li>
+                <li><strong>CFG:</strong> Calls <span class="func-tag">dfa_to_cfg(dfa)</span> (in <span class="file-tag">Core/grammar.py</span>). This maps DFA states to Grammar Variables and transitions to right-linear production rules.</li>
+                <li><strong>Strings:</strong> Calls <span class="func-tag">enumerate_strings(dfa, 6)</span> (in <span class="file-tag">Core/enumerator.py</span>). This performs a Breadth-First Search over the DFA transitions to yield the shortest, lexicographically sorted accepted strings.</li>
+                <li><strong>English:</strong> Calls <span class="func-tag">describe_dfa(dfa)</span> (in <span class="file-tag">Nlg/describer.py</span>). This analyzes the DFA's topology to apply hardcoded heuristics, outputting a natural language summary.</li>
+            </ul>
+            <p>The controller packs the results into a single Python dictionary and returns it back to the background worker.</p>
+        </div>
+
+        <div class="pipeline-step">
+            <div class="step-title"><span class="step-num">5</span> UI Update & Graph Rendering</div>
+            <p><strong>How it works:</strong> The background thread emits a signal carrying the results dictionary back to the Main UI Thread.</p>
+            <ul>
+                <li>A slot function (usually something like <code>on_convert_finished</code> in <span class="file-tag">GUI/main_window.py</span>) receives the dictionary and updates the text of the right-hand panel widgets.</li>
+                <li>To draw the graph, it takes the minimal <code>DFA</code> object and calls the <span class="func-tag">to_graphviz()</span> method (defined inside the DFA class in <span class="file-tag">Core/automata.py</span>).</li>
+                <li>This generates a DOT language string which is passed to the Graphviz engine to render a visual graph. The resulting image is loaded into the custom Canvas widget managed by <span class="file-tag">GUI/dfa_canvas.py</span>.</li>
+            </ul>
+        </div>
+    </section>
+
     <section class="file-details">
-        <h2>2. Detailed File Breakdown</h2>
+        <h2>3. Detailed File Breakdown</h2>
         
         <div class="module-group">
             <h3>Root Directory (Orchestration & Setup)</h3>
